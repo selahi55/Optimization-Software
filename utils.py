@@ -41,4 +41,46 @@ def get_variables(expr):
     return list(expr.free_symbols)
 
 
-print(get_variables(parse_mathematical_expression("2x+3y")))
+def convert_constraints_to_matrix(constraints: list):
+    """
+    Converts a list of SymPy inequality expressions into matrix form A * x <= b.
+    
+    Args:
+        constraints (list): List of SymPy inequality expressions (e.g., [2*x + 3*y <= 4])
+    
+    Returns:
+        tuple: (A_ub, b_ub) where A_ub is a list of lists, and b_ub is a list of RHS values.
+    """
+    A_ub = []
+    b_ub = []
+
+    for con in constraints:
+
+        lhs = con.lhs
+        rhs = con.rhs
+
+        # Convert >= to <= by multiplying both sides by -1
+        if con.rel_op == ">=":
+            lhs = -lhs
+            rhs = -rhs
+
+        row = [float(lhs.coeff(v)) for v in get_variables(lhs)]
+        A_ub.append(row)
+        b_ub.append(float(rhs))
+
+    return A_ub, b_ub
+
+def convert_objective_to_vector(objective: list):
+    """
+    Converts a SymPy objective function into a vector form.
+    
+    Args:
+        objective (sympy.Expr): The objective function expression.
+    
+    Returns:
+        list: Coefficients of the objective function corresponding to the variables.
+    """
+    return [float(objective.coeff(v)) for v in get_variables(objective)]
+
+
+print(convert_constraints_to_matrix([sp.sympify('2*x + 3*y <= 4'), sp.sympify('x + y >= 1')]))

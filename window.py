@@ -56,18 +56,29 @@ class Window:
         pass
 
     def run(self):
-        # main window
-        with dpg.window(label="Main Window", tag="main_window"):            
-            with dpg.group(horizontal=True):
-                dpg.add_button(label="Load Problem", callback=lambda: print("Load Problem clicked"))
-                
-            dpg.add_separator()
-            self.setup_problem_formulation()
-        
-            dpg.add_separator()
-            self.setup_solve_menu()
 
-        # more setup
+        # Main application window
+        with dpg.window(label="Main Window", tag="main_window"):
+            dpg.add_text("General-Purpose Optimization Software", color=[255, 255, 255])
+
+            with dpg.tab_bar(tag="top_tabbar"):
+
+                # === Linear Programming Tab ===
+                with dpg.tab(label="Linear Programming"):
+
+                    dpg.add_separator()
+                    self.setup_problem_formulation()
+                    dpg.add_separator()
+                    self.setup_solve_menu()
+
+                # === Placeholder tabs for other problems ===
+                with dpg.tab(label="Knapsack"):
+                    dpg.add_text("Knapsack solver UI coming soon...")
+
+                with dpg.tab(label="Transportation"):
+                    dpg.add_text("Transportation solver UI coming soon...")
+
+        # Setup viewport
         dpg.set_primary_window("main_window", True)
         dpg.show_viewport()
         dpg.start_dearpygui()
