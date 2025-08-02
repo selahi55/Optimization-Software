@@ -136,3 +136,62 @@ print(ordered_symbols)
 # print(convert_constraints_to_matrix([sp.sympify('2*x + 3*y <= 4'), sp.sympify('x + 2*y <= 1')]))
 # expr = parse_expr("2x3+3x2")
 # print(sorted_variables(expr))
+    return [float(objective.coeff(v)) for v in get_variables(objective)]
+
+
+from scipy.optimize import linprog
+import numpy as np
+
+def solve_lp(A: np.ndarray, b: np.ndarray, c: np.ndarray, sense: str ='max'):
+    """
+    Solves the LP:
+        Maximize:    cᵀx
+        Subject to:  Ax ≤ b
+                     x ≥ 0
+
+    Parameters:
+        A (ndarray): Constraint matrix (m x n)
+        b (ndarray): RHS vector (length m)
+        c (ndarray): Coefficients of objective function (length n)
+
+    Returns:
+        x_opt (ndarray): Optimal solution vector
+        z_opt (float):   Optimal objective value
+    """
+    # Since linprog minimizes, we negate c to turn max into min
+    if sense == 'min':
+        res = linprog(c, A_ub=A, b_ub=b, method='highs')
+    elif sense == 'max':
+        res = linprog(-c, A_ub=A, b_ub=b, method='highs')
+    else:
+        raise ValueError("Sense must be either 'min' or 'max'")
+
+    if res.success:
+        x_opt = res.x
+        z_opt = c @ x_opt  # Compute max value (undo negation)
+        return x_opt, z_opt
+    if res.success:
+        x_opt = res.x
+        z_opt = c @ x_opt  # Undo negation
+        return x_opt, z_opt
+    else:
+        # Distinguish between unbounded and infeasible
+        if res.status == 3:
+            raise ValueError("The problem is unbounded: objective function can increase indefinitely.")
+        elif res.status == 2:
+            raise ValueError("The problem is infeasible: no solution satisfies all constraints.")
+        else:
+            raise ValueError(f"LP solve failed: {res.message}")
+
+A = np.array([
+    [1, 1],
+    [2, 7]
+])
+b = np.array([1, 6])  # Now conflicting
+c = np.array([1, 2])  # Objective function coefficients
+
+x_opt, z_opt = solve_lp(A, b, c)
+
+print("Optimal solution:", x_opt)
+print("Optimal value:", z_opt)
+
