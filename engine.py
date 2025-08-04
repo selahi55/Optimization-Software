@@ -28,6 +28,7 @@ class Engine:
         # Solve using scipy.optimize.linprog
         # res = scp.optimize.linprog(c, A_eq=A, b_eq=b, method='highs')
         # print(res)
+        return "hello"
 
     # Simplex Algorithm (Iterative Method)
     def simplex_iterative(self):

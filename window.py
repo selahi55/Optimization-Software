@@ -32,7 +32,9 @@ class Window:
             if not validation_result:
                 return 
             self.engine = Engine(self.sense, self.obj_func, self.constraints)
-            self.engine.simplex_scipy()
+            solution = self.engine.simplex_scipy()
+            self.show_solution(solution)
+
         except Exception as e:
             self.show_error(f"Solving failed: {str(e)}")
 
@@ -77,7 +79,7 @@ class Window:
     def setup_problem_formulation(self):
         # Error display area (initially hidden)
         with dpg.group(tag="error_group"):
-            dpg.add_text("", tag="error_text", color=(255, 0, 0))  # Red text
+            dpg.add_text("", tag="error_text", color=(255, 0, 0)) # Red Text
             dpg.add_spacer(height=5)
         dpg.hide_item("error_group")
 
@@ -87,19 +89,26 @@ class Window:
             dpg.add_text("Objective Function:")
             with dpg.group(horizontal=True):
                 dpg.add_combo(["Minimize", "Maximize"], default_value="Minimize", width=100, tag="sense")
-                dpg.add_input_text(hint="Enter your objective function (e.g. 2x + 3y)", width=500, tag="obj_func")
+                dpg.add_input_text(hint="Enter your objective function (e.g. 2x1 + 3x2) with variables in alphabetical order", width=500, tag="obj_func")
         
         dpg.add_separator()
         with dpg.group(tag="constraint_area"):
             dpg.add_text("Constraints:")
-            dpg.add_input_text(hint="Constraint 1 (e.g. 2x + 3y <= 4)", width=500, tag="constraint_1")
+            dpg.add_input_text(hint="Constraint 1 (e.g. 2x1 + 3x2 <= 4) with variables in alphabetical order", width=500, tag="constraint_1")
             dpg.add_button(label="+ Add Constraint", callback=self.add_constraint, tag="constraint_button")
+        
+        dpg.add_separator()
+        # Solution display area (also initially hidden)
+        with dpg.group(tag="solution_group"):
+            dpg.add_text("Solution Area", tag="solution_text", color=(0, 128, 0))  # Green text
+            dpg.add_spacer(height=5)
+        dpg.hide_item("solution_group")
             
     def setup_solve_menu(self):
         with dpg.group(horizontal=True):
             dpg.add_button(label="Solve", callback=self.problem_submit)
             dpg.add_button(label="Visualize", callback=lambda: print("Visualize clicked"))
-            
+
     # ===ERROR HANDLING===
 
     def show_error(self, message):
@@ -111,8 +120,12 @@ class Window:
         # Hides errors
         dpg.hide_item("error_group")
 
-    def solve(self):
-        pass
+    # ===SOLUTION DISPLAY===
+
+    def show_solution(self, message):
+        # Displays solution
+        dpg.set_value("solution_text", f"Solution: {message}")
+        dpg.show_item("solution_group")
 
     def run(self):
         # Main application window

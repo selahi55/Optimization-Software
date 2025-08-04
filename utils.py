@@ -2,8 +2,9 @@ import re
 import sympy as sp
 import numpy as np
 from sympy.parsing.sympy_parser import parse_expr
-from collections import OrderedDict
+from scipy.optimize import linprog
 
+# CONSTANTS
 SCREEN_HEIGHT = 750
 SCREEN_WIDTH = 1200
 
@@ -136,11 +137,8 @@ print(ordered_symbols)
 # print(convert_constraints_to_matrix([sp.sympify('2*x + 3*y <= 4'), sp.sympify('x + 2*y <= 1')]))
 # expr = parse_expr("2x3+3x2")
 # print(sorted_variables(expr))
-    return [float(objective.coeff(v)) for v in get_variables(objective)]
 
 
-from scipy.optimize import linprog
-import numpy as np
 
 def solve_lp(A: np.ndarray, b: np.ndarray, c: np.ndarray, sense: str ='max'):
     """
