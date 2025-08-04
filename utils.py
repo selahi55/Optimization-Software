@@ -17,7 +17,7 @@ def get_variables(expr):
     Extract variables from a SymPy expression in the order they appear (first occurrence order).
     
     Args:
-        expr (sympy.Expr): A parsed SymPy expression
+        expr (sympy.Expr): A parsed SymPy expression    
         
     Returns:
         List[sympy.Symbol]: Variables in order of first appearance
@@ -166,4 +166,3 @@ def solve_lp(A: np.ndarray, b: np.ndarray, c: np.ndarray, sense: str ='max'):
 
 
 
-print(convert_constraints_to_matrix([parse_mathematical_expression("2x + 3y < 4")]))
