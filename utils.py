@@ -3,10 +3,42 @@ import sympy as sp
 import numpy as np
 from sympy.parsing.sympy_parser import parse_expr
 from scipy.optimize import linprog
+from collections import OrderedDict
+from scipy.optimize import linprog
+
 
 # CONSTANTS
 SCREEN_HEIGHT = 750
 SCREEN_WIDTH = 1200
+
+# Used to get the ordered variables from a SymPy expression
+import sympy as sp
+
+def get_variables(expr):
+    """
+    Extract variables from a SymPy expression in the order they appear (first occurrence order).
+    
+    Args:
+        expr (sympy.Expr): A parsed SymPy expression    
+        
+    Returns:
+        List[sympy.Symbol]: Variables in order of first appearance
+    """
+    seen = set()
+    ordered_vars = []
+
+    def visit(e):
+        if isinstance(e, sp.Symbol):
+            if e not in seen:
+                seen.add(e)
+                ordered_vars.append(e)
+        elif hasattr(e, 'args'):
+            for arg in e.args:
+                visit(arg)
+
+    visit(expr)
+    return ordered_vars
+
 
 # Used for parsing problem formulation
 def parse_mathematical_expression(expr_str):
@@ -51,9 +83,6 @@ def parse_mathematical_expression(expr_str):
         print(f"Error parsing expression: {e}")
         return None
     
-# print(parse_mathematical_expression("2x+4y<=3"))
-# c = [parse_mathematical_expression("2x+4y").coeff(x) for x in list(parse_mathematical_expression("2x+4y").free_symbols)]
-# print(c)
 
 def convert_constraints_to_matrix(constraints: list):
     """
@@ -75,9 +104,9 @@ def convert_constraints_to_matrix(constraints: list):
         # Convert >= to <= by multiplying both sides by -1
         if con.rel_op == ">=":
             lhs = -lhs
-            rhs = -rhs
+            rhs = -rhs  
 
-        row = [float(lhs.coeff(v)) for v in lhs.free_symbols if lhs]
+        row = [float(lhs.coeff(v)) for v in get_variables(lhs) if lhs]
         A_ub.append(row)
         b_ub.append(float(rhs))
 
@@ -93,7 +122,7 @@ def convert_objective_to_vector(obj_func):
     Returns:
         list: Coefficients of the objective function corresponding to the variables.
     """
-    return np.array( [float(obj_func.coeff(var)) for var in list(obj_func.free_symbols) if obj_func] )
+    return np.array( [float(obj_func.coeff(var)) for var in list(get_variables(obj_func)) if obj_func] )
 
 
 def sorted_variables(expr: sp.Expr):
@@ -181,15 +210,5 @@ def solve_lp(A: np.ndarray, b: np.ndarray, c: np.ndarray, sense: str ='max'):
         else:
             raise ValueError(f"LP solve failed: {res.message}")
 
-A = np.array([
-    [1, 1],
-    [2, 7]
-])
-b = np.array([1, 6])  # Now conflicting
-c = np.array([1, 2])  # Objective function coefficients
 
-x_opt, z_opt = solve_lp(A, b, c)
-
-print("Optimal solution:", x_opt)
-print("Optimal value:", z_opt)
 
