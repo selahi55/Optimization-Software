@@ -55,7 +55,6 @@ class Window:
             return False
             
         for i, constraint in enumerate(constraints, 1):
-            print(constraint, i)
             if constraint:  # Only validate non-empty constraints
                 parsed_constraint = parse_mathematical_expression(constraint)
                 
@@ -87,14 +86,13 @@ class Window:
         dpg.add_text("Manual Problem Formulation:", color=(0, 128, 0))
         with dpg.group(horizontal=True):
             dpg.add_text("Objective Function:")
-            with dpg.group(horizontal=True):
-                dpg.add_combo(["Minimize", "Maximize"], default_value="Minimize", width=100, tag="sense")
-                dpg.add_input_text(hint="Enter your objective function (e.g. 2x1 + 3x2) with variables in alphabetical order", width=500, tag="obj_func")
-        
+            dpg.add_combo(["Minimize", "Maximize"], default_value="Minimize", width=100, tag="sense")
+            dpg.add_input_text(hint="Enter your objective function (e.g. 2x1 + 3x2) with variables in alphabetical order", width=600, tag="obj_func")
+    
         dpg.add_separator()
         with dpg.group(tag="constraint_area"):
             dpg.add_text("Constraints:")
-            dpg.add_input_text(hint="Constraint 1 (e.g. 2x1 + 3x2 <= 4) with variables in alphabetical order", width=500, tag="constraint_1")
+            dpg.add_input_text(hint="Constraint 1 (e.g. 2x1 + 3x2 <= 4) with variables in alphabetical order", width=550, tag="constraint_1")
             dpg.add_button(label="+ Add Constraint", callback=self.add_constraint, tag="constraint_button")
         
         dpg.add_separator()

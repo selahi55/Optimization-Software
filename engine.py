@@ -14,21 +14,17 @@ class Engine:
     def simplex_scipy(self):
         # Extract coefficients for objective and constraints
         parsed_obj_func = parse_mathematical_expression(self.obj_func)
-        c = np.array( [float(parsed_obj_func.coeff(var)) for var in list(parsed_obj_func.free_symbols)] )
-        A = [1, 2, 3]
-        b = [3, 4, 6]
-        # A = convert_constraints_to_matrix(self.constraints)
-        # b = convert_objective_to_vector(self.)
-        bounds = []
+        variables = list(parsed_obj_func.free_symbols)
+        c = np.array([float(parsed_obj_func.coeff(var)) for var in variables])
+        A, b = convert_constraints_to_matrix( [parse_mathematical_expression(constraint) for constraint in self.constraints] )
+        bounds = [(0, None) for _ in variables]  # Non-negative variables
 
         # Determine sense
         if self.sense.lower() == 'maximization':
-            c = -c  # linprog does minimization
+            c = -c  
 
-        # Solve using scipy.optimize.linprog
-        # res = scp.optimize.linprog(c, A_eq=A, b_eq=b, method='highs')
-        # print(res)
-        return "hello"
+        result = scp.optimize.linprog(c, A_ub=A, b_ub=b, bounds=bounds, method='highs')
+        return result
 
     # Simplex Algorithm (Iterative Method)
     def simplex_iterative(self):

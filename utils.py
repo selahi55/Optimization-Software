@@ -6,13 +6,9 @@ from scipy.optimize import linprog
 from collections import OrderedDict
 from scipy.optimize import linprog
 
-
 # CONSTANTS
 SCREEN_HEIGHT = 750
 SCREEN_WIDTH = 1200
-
-# Used to get the ordered variables from a SymPy expression
-import sympy as sp
 
 def get_variables(expr):
     """
@@ -138,36 +134,6 @@ def sorted_variables(expr: sp.Expr):
         list[sp.Symbol]: Sorted list of symbols in order of first appearance.
     """
     return sorted(expr.free_symbols, key = lambda symbol: symbol.name)
-
-print(convert_objective_to_vector(parse_mathematical_expression("2profit+3x87")))
-print(parse_mathematical_expression("2profit+3x87").free_symbols)
-
-expr = "2profit+3x88+8x9+9x12+9profit2"
-vars = []
-for i in parse_mathematical_expression(expr).free_symbols:
-    if str(i) in expr:
-        vars.append(i)
-free_syms = sorted(parse_mathematical_expression(expr).free_symbols, key = lambda symbol: symbol.name)
-print(free_syms)
-
-ordered_symbols = {}
-counter = 1
-
-# Traverse the expression tree nodes
-for item in sp.preorder_traversal(parse_mathematical_expression(expr)):
-    # Check if the item is a symbol and has not been seen before
-    if isinstance(item, sp.Symbol) and item.name not in ordered_symbols:
-        ordered_symbols[item.name] = counter
-        counter += 1
-        
-print(ordered_symbols)
-
-
-# print(convert_constraints_to_matrix([sp.sympify('2*x + 3*y <= 4'), sp.sympify('x + 2*y <= 1')]))
-# expr = parse_expr("2x3+3x2")
-# print(sorted_variables(expr))
-
-
 
 def solve_lp(A: np.ndarray, b: np.ndarray, c: np.ndarray, sense: str ='max'):
     """
